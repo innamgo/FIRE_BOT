@@ -7,7 +7,7 @@ import psycopg2
 import logging.handlers
 import logging
 import traceback
-log_handlers = [logging.handlers.RotatingFileHandler(filename='/home/coinbot/update_trade_target_log.txt', maxBytes=1024*10), logging.StreamHandler()]
+log_handlers = [logging.handlers.RotatingFileHandler(filename='/home/coinbot/update_trade_target_log.txt', maxBytes=1024), logging.StreamHandler()]
 logging.basicConfig(level = logging.INFO, format = '%(asctime)s [%(levelname)s] : %(message)s', handlers = log_handlers)
 logger = logging.getLogger('trade_logger')
 
@@ -81,8 +81,9 @@ conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', passwo
 conn.autocommit = True
 cur = conn.cursor()
 slack_token = os.environ['xoxb']
+jk_slack_token = os.environ['jk_xoxb']
 client = WebClient(token=slack_token)
-
+jk_client = WebClient(token=jk_slack_token)
 def insert_code_group(group_name, code_key, code_value_char_1, code_value_int_1, code_value_float_1):
     insert_code_group_query = f"""
     insert into code_group (group_name, code_key, code_value_char_1, code_value_int_1, code_value_float_1)

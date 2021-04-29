@@ -11,7 +11,7 @@ logging.basicConfig(level = logging.INFO, format = '%(asctime)s [%(levelname)s] 
 logger = logging.getLogger('auto_trade_logger')
 
 upbit = pyupbit.Upbit(os.environ['ysl_accesskey'], os.environ['ysl_secretkey'])
-max_buy_limit = 20000
+max_buy_limit = 5500
 max_sell_limit_rate = 1.04
 max_auto_trade_sceond = 60*60*3
 loop_auto_trade_second = 0
@@ -130,7 +130,7 @@ while True:
                 sell_unit_price = get_tick_size(pyupbit.get_current_price(auto_trade[0]), max_sell_limit_rate)
                 sell_order_result = upbit.sell_limit_order(auto_trade[0], sell_unit_price, current_market_balance)
                 insert_trade_transaction_log('sell', auto_trade[0], sell_order_result)
-            elif wait_buy_trade == 0 and wait_sell_trade == 0 and current_market_balance == 0 and krw_balance > my_money: #미체결 매수/매도가 없다면 최대 정해진 금액 이하로 매수
+            elif wait_buy_trade == 0 and wait_sell_trade == 0 and current_market_balance == 0 and krw_balance >= my_money and krw_balance >= max_buy_limit: #미체결 매수/매도가 없다면 최대 정해진 금액 이하로 매수
                 buy_order_result = upbit.buy_limit_order(auto_trade[0], get_tick_size(current_unit_price,0.99), round(max_buy_limit / current_unit_price,6))
                 insert_trade_transaction_log('buy', auto_trade[0], buy_order_result)
             elif wait_buy_trade == 0 and wait_sell_trade > 0 and current_market_balance == 0: #미체결 매수가 없고 매도만 있다면 정해진 시간이 지난 후 자동매매 대상에서 삭제 미체결 주문도 취소
