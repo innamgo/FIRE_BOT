@@ -1,3 +1,4 @@
+import os
 import pyupbit
 import time
 from time import sleep
@@ -25,7 +26,7 @@ insert into public.ticker_price_delta_fact(
 #업비트 티커 코드 조회
 tickers = pyupbit.get_tickers(fiat="KRW")
 print(tickers)
-conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password='', port='5432')
+conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
 cur = conn.cursor()
 
 #티커별 현재가 조회
