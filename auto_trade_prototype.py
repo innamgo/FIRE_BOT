@@ -6,7 +6,7 @@ from time import sleep
 import logging.handlers
 import logging
 import traceback
-log_handlers = [logging.handlers.RotatingFileHandler(filename='/home/coinbot/log_hoon.txt', maxBytes=1024*10), logging.StreamHandler()]
+log_handlers = [logging.handlers.RotatingFileHandler(filename='/home/coinbot/log_hoon.txt', maxBytes=1024), logging.StreamHandler()]
 logging.basicConfig(level = logging.INFO, format = '%(asctime)s [%(levelname)s] : %(message)s', handlers = log_handlers)
 logger = logging.getLogger('auto_trade_logger')
 
@@ -19,7 +19,7 @@ loop_auto_trade_second = 0
 wait_second = 10
 my_money = 5500
 user_id = 'hoonkim'
-conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password='', port='5432')
+conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
 conn.autocommit = True
 cur = conn.cursor()
 def get_tick_size(price, increase):

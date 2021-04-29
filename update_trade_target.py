@@ -77,7 +77,7 @@ group by ticker_name
 on delta_total.ticker_name = delta_minus.ticker_name
 where total_avg_delta <= -{alarm_threshold} and minus_cnt_delta >= 7
 """
-conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password='', port='5432')
+conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
 conn.autocommit = True
 cur = conn.cursor()
 slack_token = os.environ['xoxb']
