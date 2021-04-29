@@ -129,6 +129,10 @@ while True:
                     channel="showmethemoney",
                     text="상승 중 : " + coin_message
                 )
+		response = jk_client.chat_postMessage(
+                    channel="blockchain",
+                    text="상승 중 : " + coin_message
+                )
                 insert_code_group('auto_order', alarm[0], 'on', 1, alarm[3])
             except SlackApiError as e:
                 # You will get a SlackApiError if "ok" is False
@@ -145,6 +149,10 @@ while True:
             response = client.chat_postMessage(
                 channel="showmethemoney",
                 text="하락 중 : " + coin_message
+            )
+            response = jk_client.chat_postMessage(
+                    channel="blockchain",
+                    text="하락 중 : " + coin_message
             )
             logger.debug(coin_message)
         sleep(60)
