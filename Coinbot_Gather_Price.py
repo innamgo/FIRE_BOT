@@ -5,7 +5,7 @@ from time import sleep
 import psycopg2
 
 start = time.time()
-getting_interval = 60
+getting_interval = 30
 alarm_threshold = 1.00 # 1분간 상승 또는 하락 비율이 1% 이상일 경우
 price_delta_insert_query = f"""
 insert into public.ticker_price_delta_fact(

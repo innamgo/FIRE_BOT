@@ -19,6 +19,38 @@ delete_auto_trade_count = 0
 loop_count = 0
 plus_price_delta_select_query = f"""
 select  delta_total.ticker_name ticker_name
+        , coalesce(total_avg_delta,0) total_avg_delta, coalesce(total_cnt_delta,0) total_cnt_delta, coalesce(plus_avg_delta,0) plus_avg_delta
+        , coalesce(plus_cnt_delta,0) plus_cnt_delta, coalesce(minus_avg_delta,0) minus_avg_delta, coalesce(minus_cnt_delta,0) minus_cnt_delta
+    ,get_code('market',delta_total.ticker_name) korean_name
+from
+(
+select ticker_name, round(cast(avg(delta) as numeric),3) total_avg_delta, count(delta) total_cnt_delta
+from public.ticker_price_delta_fact
+where sequence_number >= (SELECT last_value-60 FROM sequence_main) 
+group by ticker_name
+) delta_total
+left join (
+select ticker_name, round(cast(avg(delta) as numeric),3) plus_avg_delta, count(delta) plus_cnt_delta
+from public.ticker_price_delta_fact
+where sequence_number >= (SELECT last_value-60 FROM sequence_main) 
+      and delta > 0.0
+group by ticker_name
+) delta_plus
+on delta_total.ticker_name = delta_plus.ticker_name
+left join (
+select ticker_name, round(cast(avg(delta) as numeric),3) minus_avg_delta, count(delta) minus_cnt_delta
+from public.ticker_price_delta_fact
+where sequence_number >= (SELECT last_value-60 FROM sequence_main) 
+      and delta < 0.0
+group by ticker_name
+) delta_minus
+on delta_total.ticker_name = delta_minus.ticker_name
+where abs(plus_avg_delta) > abs(minus_avg_delta)
+and (plus_cnt_delta - minus_cnt_delta) > 2
+and total_avg_delta > 0.0
+and plus_avg_delta >= 0.3
+union
+select  delta_total.ticker_name ticker_name
 	, coalesce(total_avg_delta,0) total_avg_delta, coalesce(total_cnt_delta,0) total_cnt_delta, coalesce(plus_avg_delta,0) plus_avg_delta
 	, coalesce(plus_cnt_delta,0) plus_cnt_delta, coalesce(minus_avg_delta,0) minus_avg_delta, coalesce(minus_cnt_delta,0) minus_cnt_delta
     ,get_code('market',delta_total.ticker_name) korean_name
@@ -120,7 +152,7 @@ while True:
         cur.execute(plus_price_delta_select_query)
         logger.debug(plus_price_delta_select_query)
         alarm_list = cur.fetchall()
-        logger.debug(alarm_list)
+        logger.info(alarm_list)
         for alarm in alarm_list:
             try:
                 coin_message = f"{alarm[0]} 코인이 최근 {getting_interval}분간  {alarm[3]} % 등락이 있었습니다. https://news.google.com/search?q={alarm[7]}&hl=ko&gl=KR&ceid=KR:ko"

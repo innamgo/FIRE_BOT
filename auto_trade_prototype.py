@@ -64,7 +64,7 @@ def select_auto_trade_except():
     union
     select code_key from code_group where group_name ='auto_order' and create_date > current_timestamp - '60 minutes'::interval
     and code_key not in (select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}' )
-    group by code_key having count(*) > 2
+    group by code_key having count(*) > 1
     """
     logger.info(select_auto_trade_except_query)
     cur.execute(select_auto_trade_except_query)
@@ -73,7 +73,7 @@ def select_auto_trade_except():
 auto_trade_list_query = f"""
 select code_key, count(*) cnt from code_group where group_name ='auto_order' and create_date > current_timestamp - '60 minutes'::interval
 and code_key not in (select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}' ) 
-group by code_key having count(*) > 2 
+group by code_key having count(*) > 1 
 """
 def delete_auto_trade_market():
     delete_auto_trade_list_query = f"""
