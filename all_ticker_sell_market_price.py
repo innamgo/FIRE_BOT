@@ -78,8 +78,12 @@ try:
                 logger.info('exist except item : ' + market_name)
         if skip_yn == 'yes':
             continue
+        if market_name =='KRW-KRW':
+            continue
+
         logger.info('try sell : ' + market_name)
         non_trade_list = upbit.get_order(market_name)
+        logger.info(non_trade_list)
         wait_buy_trade = get_element_include(non_trade_list, 'side', 'ask')  # 매수 미체결 개수
         wait_sell_trade = get_element_include(non_trade_list, 'side', 'bid')  # 매도 미체결 개수
         current_market_balance = upbit.get_balance(ticker=market_name)  # 현재 해당 코인 잔고 조회
@@ -94,6 +98,7 @@ try:
             cancel_order_result = upbit.cancel_order(cancel_uuid)
             insert_trade_transaction_log('cancel', market_name, cancel_order_result)
 
+        logger.info('bal:'+ str(current_market_balance))
         sell_order_result = upbit.sell_market_order(market_name, current_market_balance)
         insert_trade_transaction_log('forced_sell', market_name, sell_order_result)
 
