@@ -11,13 +11,13 @@ logging.basicConfig(level = logging.INFO, format = '%(asctime)s [%(levelname)s] 
 logger = logging.getLogger('auto_trade_logger')
 
 upbit = pyupbit.Upbit(os.environ['accesskey'], os.environ['secretkey'])
-max_buy_limit = 30000
+max_buy_limit = 20000
 max_sell_limit_rate = 1.04
 max_buy_limit_rate = 1.0
 max_auto_trade_sceond = 60*60*3
 loop_auto_trade_second = 0
 wait_second = 10
-my_money = 5500
+my_money = 1200000
 user_id = 'hoonkim'
 conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
 conn.autocommit = True
