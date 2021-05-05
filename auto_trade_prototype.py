@@ -24,7 +24,7 @@ cur = conn.cursor()
 cur.execute("select get_code('system_parameter','accesskey','hoonkim') accesskey, get_code('system_parameter','secretkey','hoonkim') secretkey")
 upbit_key = cur.fetchall()
 print(upbit_key)
-upbit = pyupbit.Upbit(upbit_key[0], upbit_key[1])
+upbit = pyupbit.Upbit(upbit_key[0][0], upbit_key[0][1])
 
 def get_tick_size(price, increase):
     if price >= 2000000:
@@ -123,7 +123,7 @@ while True:
         logger.info(system_parameter_query)
         system_parameter = cur.fetchall()
         #자동 매매 대상 목록 조회
-        if system_parameter[2] == 'on':
+        if system_parameter[0][2] == 'on':
             cur.execute(auto_trade_list_query)
             logger.info(auto_trade_list_query)
             auto_trade_list = cur.fetchall()
@@ -159,8 +159,8 @@ while True:
                     sell_unit_price = get_tick_size(pyupbit.get_current_price(auto_trade[0]), max_sell_limit_rate)
                     sell_order_result = upbit.sell_limit_order(auto_trade[0], sell_unit_price, current_market_balance)
                     insert_trade_transaction_log('sell', auto_trade[0], sell_order_result)
-                elif wait_buy_trade == 0 and wait_sell_trade == 0 and current_market_balance == 0 and krw_balance > int(system_parameter[1]): #미체결 매수/매도가 없다면 최대 정해진 금액 이하로 매수
-                    buy_order_result = upbit.buy_limit_order(auto_trade[0], get_tick_size(current_unit_price, max_buy_limit_rate), round(int(system_parameter[0]) / current_unit_price,6))
+                elif wait_buy_trade == 0 and wait_sell_trade == 0 and current_market_balance == 0 and krw_balance > int(system_parameter[0][1]): #미체결 매수/매도가 없다면 최대 정해진 금액 이하로 매수
+                    buy_order_result = upbit.buy_limit_order(auto_trade[0], get_tick_size(current_unit_price, max_buy_limit_rate), round(int(system_parameter[0][0]) / current_unit_price,6))
                     #logger.info('get_tick_size(current_unit_price,0.99) : ' + str(get_tick_size(current_unit_price,0.99)) + ', round(max_buy_limit / current_unit_price,6): ' + str(round(max_buy_limit / current_unit_price,6)))
                     #logger.info(buy_order_result)
                     insert_trade_transaction_log('buy', auto_trade[0], buy_order_result)
