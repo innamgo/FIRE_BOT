@@ -11,12 +11,12 @@ logging.basicConfig(level = logging.INFO, format = '%(asctime)s [%(levelname)s] 
 logger = logging.getLogger('auto_trade_logger')
 
 upbit = pyupbit.Upbit(os.environ['ysl_accesskey'], os.environ['ysl_secretkey'])
-max_buy_limit = 5500
+max_buy_limit = 10000
 max_sell_limit_rate = 1.04
 max_auto_trade_sceond = 60*60*3
 loop_auto_trade_second = 0
 wait_second = 10
-my_money = 5500
+my_money = 100000
 user_id = 'ysl'
 conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
 conn.autocommit = True
@@ -61,18 +61,18 @@ def select_auto_trade_except():
     select_auto_trade_except_query = f"""
     select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}'
     union
-    select code_key from code_group where group_name ='auto_order' and create_date > current_timestamp - '60 minutes'::interval
+    select code_key from code_group where group_name ='auto_order' and create_date > current_timestamp - '30 minutes'::interval
     and code_key not in (select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}' )
-    group by code_key having count(*) > 2
+    group by code_key having count(*) > 1 and avg(code_value_float_1) >= 0.5
     """
     logger.info(select_auto_trade_except_query)
     cur.execute(select_auto_trade_except_query)
     return cur.fetchall()
 
 auto_trade_list_query = f"""
-select code_key, count(*) cnt from code_group where group_name ='auto_order' and create_date > current_timestamp - '60 minutes'::interval
+select code_key, count(*) cnt from code_group where group_name ='auto_order' and create_date > current_timestamp - '30 minutes'::interval
 and code_key not in (select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}' ) 
-group by code_key having count(*) > 2 
+group by code_key having count(*) > 1 and avg(code_value_float_1) >= 0.5
 """
 def delete_auto_trade_market():
     delete_auto_trade_list_query = f"""

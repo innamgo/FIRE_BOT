@@ -17,7 +17,7 @@ max_buy_limit_rate = 1.0
 max_auto_trade_sceond = 60*60*3
 loop_auto_trade_second = 0
 wait_second = 10
-my_money = 800000
+my_money = 1300000
 user_id = 'hoonkim'
 conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
 conn.autocommit = True
@@ -64,16 +64,16 @@ def select_auto_trade_except():
     union
     select code_key from code_group where group_name ='auto_order' and create_date > current_timestamp - '30 minutes'::interval
     and code_key not in (select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}' )
-    group by code_key having count(*) > 2 and avg(code_value_float_1) > 0.5
+    group by code_key having count(*) > 1 and avg(code_value_float_1) >= 0.5
     """
     logger.info(select_auto_trade_except_query)
     cur.execute(select_auto_trade_except_query)
     return cur.fetchall()
 
 auto_trade_list_query = f"""
-select code_key, count(*) cnt from code_group where group_name ='auto_order' and create_date > current_timestamp - '60 minutes'::interval
+select code_key, count(*) cnt from code_group where group_name ='auto_order' and create_date > current_timestamp - '30 minutes'::interval
 and code_key not in (select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}' ) 
-group by code_key having count(*) > 1 
+group by code_key having count(*) > 1 and avg(code_value_float_1) >= 0.5 
 """
 def delete_auto_trade_market():
     delete_auto_trade_list_query = f"""

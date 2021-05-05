@@ -88,6 +88,7 @@ try:
         logger.info('try sell : ' + market_name)
         non_trade_list = upbit.get_order(market_name)
         logger.info(non_trade_list)
+        sleep(0.2)
         wait_buy_trade = get_element_include(non_trade_list, 'side', 'bid')  # 매수 미체결 개수
         wait_sell_trade = get_element_include(non_trade_list, 'side', 'ask')  # 매도 미체결 개수
         current_market_balance = upbit.get_balance(ticker=market_name)  # 현재 해당 코인 잔고 조회
