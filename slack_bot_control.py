@@ -6,6 +6,17 @@ from time import sleep
 import logging.handlers
 import logging
 import traceback
+from flask import Flask, redirect, url_for, request
+from flask import Response
+import json
+app = Flask(__name__)
+
+@app.route('/slack', methods=['POST','GET'])
+def slack():
+    payload = request.get_data()
+    data = json.loads(payload)
+    return Response(data["challenge"], mimetype='application/x-www-form-urlencoded')
+
 log_handlers = [logging.handlers.RotatingFileHandler(filename='/home/coinbot/slack_bot_log.txt', maxBytes=1024), logging.StreamHandler()]
 logging.basicConfig(level = logging.INFO, format = '%(asctime)s [%(levelname)s] : %(message)s', handlers = log_handlers)
 logger = logging.getLogger('auto_trade_logger')
