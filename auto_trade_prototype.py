@@ -17,9 +17,9 @@ max_buy_limit_rate = 1.0
 max_auto_trade_sceond = 60*60*3
 loop_auto_trade_second = 0
 wait_second = 10
-my_money = 1300000
+my_money = 1000000
 user_id = 'hoonkim'
-conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
+conn = psycopg2.connect(host=os.environ['db_url'], dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
 conn.autocommit = True
 cur = conn.cursor()
 def get_tick_size(price, increase):
@@ -64,14 +64,14 @@ def select_auto_trade_except():
     union
     select code_key from code_group where group_name ='auto_order' and create_date > current_timestamp - '30 minutes'::interval
     and code_key not in (select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}' )
-    group by code_key having count(*) > 1 and avg(code_value_float_1) >= 0.5
+    group by code_key having count(*) > 1 and avg(code_value_float_1) >= 0.5 
     """
     logger.info(select_auto_trade_except_query)
     cur.execute(select_auto_trade_except_query)
     return cur.fetchall()
 
 auto_trade_list_query = f"""
-select code_key, count(*) cnt from code_group where group_name ='auto_order' and create_date > current_timestamp - '30 minutes'::interval
+select code_key, count(*) cnt, sum(code_value_float_1) sum_delta, avg(code_value_float_1) avg_delta from code_group where group_name ='auto_order' and create_date > current_timestamp - '30 minutes'::interval
 and code_key not in (select code_key from code_group where group_name ='auto_order_except' and code_value_char_2 ='{user_id}' ) 
 group by code_key having count(*) > 1 and avg(code_value_float_1) >= 0.5 
 """
@@ -126,20 +126,20 @@ while True:
             current_market_balance = upbit.get_balance(ticker=auto_trade[0]) #현재 해당 코인 잔고 조회
             current_unit_price = pyupbit.get_current_price(auto_trade[0])
             if auto_trade[1] > 1 and auto_trade[1] <= 10:
-                max_sell_limit_rate = 1.04
+                max_sell_limit_rate = 1.05
                 max_buy_limit_rate = 1
             elif auto_trade[1] > 11 and auto_trade[1] <= 20:
-                max_sell_limit_rate = 1.06
-                max_buy_limit_rate = 0.99
+                max_sell_limit_rate = 1.05
+                max_buy_limit_rate = 1
             elif auto_trade[1] > 21 and auto_trade[1] <= 30:
-                max_sell_limit_rate = 1.08
-                max_buy_limit_rate = 0.98
+                max_sell_limit_rate = 1.04
+                max_buy_limit_rate = 0.99
             elif auto_trade[1] > 31 and auto_trade[1] <= 40:
-                max_sell_limit_rate = 1.1
+                max_sell_limit_rate = 1.04
                 max_buy_limit_rate = 0.99
             elif auto_trade[1] > 41:
-                max_sell_limit_rate = 1.13
-                max_buy_limit_rate = 1
+                max_sell_limit_rate = 1.03
+                max_buy_limit_rate = 0.98
                 
             if wait_buy_trade > 0 and wait_sell_trade == 0 and current_market_balance == 0: #미체결 매도가 없고 미체결 매수 있고 잔고도 0이라면 있다면 아무것도 안함
                 pass
