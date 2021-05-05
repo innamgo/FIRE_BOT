@@ -23,6 +23,7 @@ conn.autocommit = True
 cur = conn.cursor()
 cur.execute("select get_code('system_parameter','accesskey','hoonkim') accesskey, get_code('system_parameter','secretkey','hoonkim') secretkey")
 upbit_key = cur.fetchall()
+print(upbit_key)
 upbit = pyupbit.Upbit(upbit_key[0], upbit_key[1])
 
 def get_tick_size(price, increase):
