@@ -190,6 +190,7 @@ while True:
         cur.execute(all_sell_detect_query)
         logger.info(all_sell_detect_query)
         all_sell_detect = cur.fetchall()
+        logger.info(all_sell_detect)
         if all_sell_detect[0][0] >= 100 and all_sell_detect[0][1] <= -1.0 and all_sell_detect[0][2] <= -1.0:
             cur.execute(auto_off_query)
             conn.commit()
@@ -289,6 +290,8 @@ while True:
             logger.info('waiting seconds : ' + str(wait_second))
             sleep(wait_second)
         else:
+            logger.info('system parameter off, waiting seconds : ' + str(wait_second))
+            sleep(wait_second)
             # 시장 상황 조회, 폭락장에서 정상화 되고 있다면 다시 켠다.
             cur.execute(all_sell_detect_query)
             logger.info(all_sell_detect_query)
@@ -297,8 +300,7 @@ while True:
                 cur.execute(auto_on_query)
                 conn.commit()
                 logger.info('auto trade on!!!')
-            logger.info('system parameter off, waiting seconds : ' + str(wait_second))
-            sleep(wait_second)
+
     except Exception as ex:
         logger.error(str(ex))
         traceback.print_exc()
