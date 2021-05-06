@@ -296,6 +296,7 @@ while True:
             cur.execute(all_sell_detect_query)
             logger.info(all_sell_detect_query)
             all_sell_detect = cur.fetchall()
+            logger.info(all_sell_detect)
             if all_sell_detect[0][0] < 85 and all_sell_detect[0][1] >= -0.5 and all_sell_detect[0][2] >= -0.5:
                 cur.execute(auto_on_query)
                 conn.commit()
