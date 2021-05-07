@@ -27,6 +27,7 @@ insert into public.ticker_price_delta_fact(
 tickers = pyupbit.get_tickers(fiat="KRW")
 print(tickers)
 conn = psycopg2.connect(host='localhost', dbname='botdb', user='coinbot', password=os.environ['db_password'], port='5432')
+conn.autocommit = True
 cur = conn.cursor()
 
 #티커별 현재가 조회
