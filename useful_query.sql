@@ -12,3 +12,9 @@ group by fact.ticker_name
 order by sum(case when price > min9 then 1 else 0 end) desc, sum(case when price < max9 then 1 else 0 end) desc;
 
 
+백큠
+delete from ticker_price_fact where create_date < '2021-05-07 00:35:32';                    
+delete from ticker_price_delta_fact where create_date < '2021-05-07 00:35:32';   
+
+vacuum full ticker_price_fact;
+vacuum full ticker_price_delta_fact;
